@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coupe du Monde 2026 — Bracket PC</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #060f1d;
+    color: #d0c0a0;
+    font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 24px 20px 18px;
+    border-bottom: 2px solid #c9a84c;
+    background: linear-gradient(180deg, #0a1a30 0%, #060f1d 100%);
+    margin-bottom: 24px;
+  }
+  .header .trophy { font-size: 36px; margin-bottom: 6px; }
+  .header h1 {
+    font-size: 22px; font-weight: 800;
+    color: #c9a84c; letter-spacing: 4px; text-transform: uppercase;
+  }
+  .header .subtitle {
+    font-size: 11px; color: #4a6a8a;
+    letter-spacing: 2px; margin-top: 4px; text-transform: uppercase;
+  }
+  .champion-badge {
+    margin-top: 12px; padding: 7px 18px; display: inline-flex;
+    align-items: center; gap: 8px;
+    background: #c9a84c18; border: 1px solid #c9a84c55;
+    border-radius: 20px; font-size: 14px;
+  }
+
+  /* ── LAYOUT PRINCIPAL ── */
+  .bracket-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 16px;
+    gap: 0;
+    overflow-x: auto;
+    min-width: 1200px;
+  }
+
+  /* ── COLONNE ── */
+  .round-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 160px;
+  }
+  .round-title {
+    font-size: 9px; font-weight: 700; color: #c9a84c;
+    letter-spacing: 2px; text-transform: uppercase;
+    text-align: center; margin-bottom: 10px;
+    padding-bottom: 6px; border-bottom: 1px solid #c9a84c44;
+    width: 100%;
+  }
+  .matches-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* ── CARTE MATCH ── */
+  .match-wrap { position: relative; }
+  .match-num {
+    font-size: 8px; color: #2a4060;
+    text-align: center; margin-bottom: 2px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .card {
+    background: #0b1a2e;
+    border: 1.5px solid #1a3354;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 148px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .card.has-winner {
+    border-color: #c9a84c88;
+    box-shadow: 0 0 8px rgba(201,168,76,0.15);
+  }
+  .card .meta {
+    background: #06101e;
+    padding: 2px 7px;
+    font-size: 8px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #1a3354;
+    color: #3a5a7a;
+  }
+  .card .meta .time { color: rgba(201,168,76,0.7); font-weight: 600; }
+  .team {
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 8px; min-height: 30px;
+    transition: background 0.1s, color 0.1s;
+    color: #c8b890; font-size: 10.5px;
+  }
+  .team:not(:first-of-type) { border-top: 1px solid #1a3354; }
+  .team.can-click { cursor: pointer; }
+  .team.can-click:hover { background: #0d2040; }
+  .team img.flag {
+    width: 26px; height: 17px;
+    object-fit: cover; border-radius: 2px; flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+  }
+  .team .flag-empty { width: 26px; height: 17px; flex-shrink: 0; }
+  .team .name {
+    flex: 1; text-transform: uppercase;
+    font-size: 9.5px; letter-spacing: 0.5px;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .team.winner {
+    background: rgba(201,168,76,0.12);
+    color: #c9a84c; font-weight: 700;
+  }
+  .team.loser { color: #1c2c3c; }
+  .team .check { color: #c9a84c; font-size: 10px; margin-left: 2px; }
+
+  /* ── CONNECTEURS ── */
+  .connector {
+    display: flex;
+    align-items: center;
+    padding-top: 18px; /* compenser le titre */
+  }
+  .connector svg { overflow: visible; }
+
+  /* ── COLONNE CENTRALE (finale) ── */
+  .center-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    min-width: 160px;
+    padding-top: 0;
+  }
+  .center-section { width: 148px; }
+  .center-title {
+    font-size: 9px; font-weight: 700; color: #c9a84c;
+    letter-spacing: 2px; text-transform: uppercase;
+    text-align: center; margin-bottom: 6px;
+  }
+
+  /* ── SPACER entre matches ── */
+  .match-spacer { flex-shrink: 0; }
+
+  /* ── SAUVEGARDE ── */
+  .saved-bar {
+    text-align: center;
+    font-size: 10px; color: #4a8a5a;
+    margin: 12px 0; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .saved-bar.show { opacity: 1; }
+
+  /* ── BOUTONS ── */
+  .controls {
+    display: flex; justify-content: center;
+    gap: 12px; margin-top: 20px;
+  }
+  .btn {
+    background: transparent;
+    border: 1px solid #1a3354;
+    color: #2a4060; font-size: 10px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 7px 20px; border-radius: 4px; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn:hover { border-color: #c9a84c88; color: #c9a84c; }
+  .btn.primary {
+    border-color: #c9a84c66; color: #c9a84c; font-weight: 700;
+  }
+
+  /* ── HINT ── */
+  .hint {
+    text-align: center; font-size: 10px;
+    color: #2a4060; margin-bottom: 20px; letter-spacing: 0.4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="trophy">🏆</div>
+  <h1>Coupe du Monde 2026</h1>
+  <div class="subtitle">Bracket officiel FIFA · Heures GMT · Version PC</div>
+  <div id="championBadge"></div>
+</div>
+
+<p class="hint">👆 Clique sur une équipe pour la qualifier au tour suivant · Sauvegarde automatique</p>
+<p class="saved-bar" id="savedBar">✓ Sauvegardé</p>
+
+<div class="bracket-container" id="bracketRoot"></div>
+
+<div class="controls">
+  <button class="btn primary" onclick="autoFillFromAPI()">🔄 Actualiser les résultats</button>
+  <button class="btn" onclick="resetAll()">↺ Réinitialiser</button>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
